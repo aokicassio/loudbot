@@ -10,16 +10,16 @@ import java.util.List;
 @Service
 public class PhoneNumberServiceImpl implements PhoneNumberService {
 
-    @Value("${whatsapp.number.cas}")
+    @Value("${number.cas}")
     private String phoneNumberCassio;
 
-    @Value("${whatsapp.number.bru}")
+    @Value("${number.bru}")
     private String phoneNumberBruno;
 
-    @Value("${whatsapp.number.gre}")
+    @Value("${number.gre}")
     private String phoneNumberGregor;
 
-    @Value("${whatsapp.number.phi}")
+    @Value("${number.phi}")
     private String phoneNumberPhilippe;
 
     @Override

@@ -18,9 +18,6 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
 
     private static final Logger LOGGER = Logger.getLogger(EthereumCryptoScheduler.class.getName());
 
-    @Value("${crypto.currency.euro}")
-    private String currency;
-
     @Value("${crypto.ethereum}")
     private String ethereumCode;
 

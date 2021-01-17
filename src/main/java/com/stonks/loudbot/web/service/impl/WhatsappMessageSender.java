@@ -18,12 +18,15 @@ public class WhatsappMessageSender implements MessageSenderService {
     @Value("${whatsapp.number.from}")
     protected String phoneNumberFrom;
 
+    @Value("${whatsapp.prefix}")
+    protected String whatsappPrefix;
+
     @Override
     public void sendMessage(String body, String phoneNumberTo) {
         Twilio.init(accountSid, authToken);
         Message.creator(
-                new com.twilio.type.PhoneNumber(phoneNumberTo),
-                new com.twilio.type.PhoneNumber(phoneNumberFrom),
+                new com.twilio.type.PhoneNumber(whatsappPrefix + phoneNumberTo),
+                new com.twilio.type.PhoneNumber(whatsappPrefix + phoneNumberFrom),
                 body)
                 .create();
     }

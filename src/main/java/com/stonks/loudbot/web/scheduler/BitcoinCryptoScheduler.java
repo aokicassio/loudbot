@@ -20,9 +20,6 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
 
     private static final Logger LOGGER = Logger.getLogger(BitcoinCryptoScheduler.class.getName());
 
-    @Value("${crypto.currency.euro}")
-    private String currency;
-
     @Value("${crypto.bitcoin}")
     private String bitcoinCode;
 
@@ -63,15 +60,13 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
                     bitcoinCode,
                     currency, bitcoinWatcher.getCheckpoint(),
                     currency, currentValue));
+        } else {
+            sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin diff is %.2f percent since last check. \n%s %.2f -> %s %.2f",
+                    bitcoinCode, diff,
+                    currency, bitcoinWatcher.getCheckpoint(),
+                    currency, currentValue));
         }
 
-        sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin diff is %.2f percent since last check. \n%s %.2f -> %s %.2f",
-                bitcoinCode, diff,
-                currency, bitcoinWatcher.getCheckpoint(),
-                currency, currentValue));
-
-
-        //sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin current price is %s%.2f", bitcoinCode, currency, currentValue));
     }
 
     public double getBitcoinCurrentValue(String code, String currency){
