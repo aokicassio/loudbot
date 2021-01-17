@@ -30,7 +30,7 @@ public abstract class CryptoScheduler {
         for(String phoneNumber : phoneNumberService.getPhoneNumbers()){
             LOGGER.log(Level.INFO, String.format("Sending message to %s ", phoneNumber));
             LOGGER.log(Level.INFO, String.format(body));
-            //messageSenderService.sendMessage(body, phoneNumber);
+            messageSenderService.sendMessage(body, phoneNumber);
         }
     }
 

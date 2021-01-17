@@ -1,6 +1,7 @@
 package com.stonks.loudbot.web.scheduler;
 
 import com.stonks.loudbot.model.Crypto;
+import com.stonks.loudbot.model.CryptoCurrency;
 import com.stonks.loudbot.web.service.CryptoCompareService;
 import com.stonks.loudbot.web.service.MessageSenderService;
 import com.stonks.loudbot.web.util.EntityMapper;
@@ -18,9 +19,6 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
 
     private static final Logger LOGGER = Logger.getLogger(EthereumCryptoScheduler.class.getName());
 
-    @Value("${crypto.ethereum}")
-    private String ethereumCode;
-
     @Autowired
     protected MessageSenderService whatsappMessageSender;
 
@@ -32,11 +30,11 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
     protected void scheduleCheck() {
         LOGGER.log(Level.INFO, "Ethereum Scheduler check triggered");
 
-        Mono<String> bitcoin = cryptoCompareService.getCryptoCurrentPrice(ethereumCode, currency);
+        Mono<String> bitcoin = cryptoCompareService.getCryptoCurrentPrice(CryptoCurrency.ETHEREUM.getCode(), currency);
         String response = bitcoin.block();
 
         Crypto crypto = EntityMapper.parseCryptoFromJsonString(response.toLowerCase());
 
-        sendMessage(whatsappMessageSender, String.format ("[%s] current price is %s %s", ethereumCode, currency, crypto.getEur()));
+        sendMessage(whatsappMessageSender, String.format ("[%s] current price is %s %s", CryptoCurrency.ETHEREUM.getCode(), currency, crypto.getEur()));
     }
 }
