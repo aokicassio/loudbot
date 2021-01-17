@@ -25,10 +25,12 @@ public abstract class CryptoScheduler {
      * @param body
      */
     protected void sendMessage(MessageSenderService messageSenderService, String body) {
+        LOGGER.log(Level.INFO, "============================================================");
         LOGGER.log(Level.INFO, "Sending out messages");
         for(String phoneNumber : phoneNumberService.getPhoneNumbers()){
-            LOGGER.log(Level.INFO, String.format ("Sending message to %s ", phoneNumber));
-            messageSenderService.sendMessage(body, phoneNumber);
+            LOGGER.log(Level.INFO, String.format("Sending message to %s ", phoneNumber));
+            LOGGER.log(Level.INFO, String.format(body));
+            //messageSenderService.sendMessage(body, phoneNumber);
         }
     }
 

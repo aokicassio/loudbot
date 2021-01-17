@@ -5,6 +5,7 @@ import com.stonks.loudbot.web.service.CryptoCompareService;
 import com.stonks.loudbot.web.service.MessageSenderService;
 import com.stonks.loudbot.web.service.impl.BitcoinWatcher;
 import com.stonks.loudbot.web.util.EntityMapper;
+import com.stonks.loudbot.web.util.MessageTemplateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,8 +21,16 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
 
     private static final Logger LOGGER = Logger.getLogger(BitcoinCryptoScheduler.class.getName());
 
+    private static final String BITCOIN = "Bitcoin";
+
     @Value("${crypto.bitcoin}")
     private String bitcoinCode;
+
+    @Value("${threshold.crypto.bitcoin.gain}")
+    private double thresholdGain;
+
+    @Value("${threshold.crypto.bitcoin.loss}")
+    private double thresholdLoss;
 
     @Autowired
     private BitcoinWatcher bitcoinWatcher;
@@ -48,23 +57,14 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
 
         double diff = bitcoinWatcher.checkDiff(currentValue);
 
-        if(diff >= 10){
+        if(diff >= thresholdGain) {
             bitcoinWatcher.setCheckpoint(currentValue);
-            sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin is up by 10 percent. \n%s%.2f -> %s %.2f",
-                    bitcoinCode,
-                    currency, bitcoinWatcher.getCheckpoint(),
-                    currency, currentValue));
-        } else if (diff <= -10) {
+            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageGain(bitcoinCode, BITCOIN, thresholdGain, currency, bitcoinWatcher.getCheckpoint(), currentValue));
+        } else if (diff <= thresholdLoss) {
             bitcoinWatcher.setCheckpoint(currentValue);
-            sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin is down by 10 percent. \n%s%.2f -> %s %.2f",
-                    bitcoinCode,
-                    currency, bitcoinWatcher.getCheckpoint(),
-                    currency, currentValue));
+            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageLoss(bitcoinCode, BITCOIN, thresholdLoss, currency, bitcoinWatcher.getCheckpoint(), currentValue));
         } else {
-            sendMessage(whatsappMessageSender, String.format ("[%s] Bitcoin diff is %.2f percent since last check. \n%s %.2f -> %s %.2f",
-                    bitcoinCode, diff,
-                    currency, bitcoinWatcher.getCheckpoint(),
-                    currency, currentValue));
+            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageDiff(bitcoinCode, BITCOIN, diff, currency, bitcoinWatcher.getCheckpoint(), currentValue));
         }
 
     }
