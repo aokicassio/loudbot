@@ -1,9 +1,13 @@
 package com.stonks.loudbot.web.scheduler;
 
+import com.stonks.loudbot.model.Crypto;
+import com.stonks.loudbot.web.service.CryptoCompareService;
 import com.stonks.loudbot.web.service.MessageSenderService;
 import com.stonks.loudbot.web.service.PhoneNumberService;
+import com.stonks.loudbot.web.util.EntityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import reactor.core.publisher.Mono;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +17,9 @@ public abstract class CryptoScheduler {
 
     @Value("${config.currency}")
     protected String currency;
+
+    @Autowired
+    protected CryptoCompareService cryptoCompareService;
 
     @Autowired
     protected PhoneNumberService phoneNumberService;
@@ -29,9 +36,23 @@ public abstract class CryptoScheduler {
         LOGGER.log(Level.INFO, "Sending out messages");
         for(String phoneNumber : phoneNumberService.getPhoneNumbers()){
             LOGGER.log(Level.INFO, String.format("Sending message to %s ", phoneNumber));
-            LOGGER.log(Level.INFO, String.format(body));
+            LOGGER.log(Level.INFO, body);
             messageSenderService.sendMessage(body, phoneNumber);
         }
+    }
+
+    /**
+     * Gets crypto current value, given code and currency
+     * @param code
+     * @param currency
+     * @return
+     */
+    protected double getCryptoCurrentValue(String code, String currency){
+        Mono<String> cryptoCoin = cryptoCompareService.getCryptoCurrentPrice(code, currency);
+        String response = cryptoCoin.block();
+        Crypto crypto = EntityMapper.parseCryptoFromJsonString(response.toLowerCase());
+
+        return crypto.getEur();
     }
 
 }
