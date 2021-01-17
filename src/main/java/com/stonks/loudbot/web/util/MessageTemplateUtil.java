@@ -6,7 +6,7 @@ public class MessageTemplateUtil {
     }
 
     public static String messageGain(String cryptoCode, String cryptoName, double threshold, String currency, double previousValue, double currentValue) {
-        return String.format ("[%s] %s is up by %s percent. %n%s%.2f -> %s %.2f",
+        return String.format ("[%s] %s is up by %s percent. %n%s %.2f -> %s %.2f",
                 cryptoCode,
                 cryptoName,
                 threshold,
@@ -15,7 +15,7 @@ public class MessageTemplateUtil {
     }
 
     public static String messageLoss(String cryptoCode, String cryptoName, double threshold, String currency, double previousValue, double currentValue) {
-        return String.format ("[%s] %s is down by %s percent. %n%s%.2f -> %s %.2f",
+        return String.format ("[%s] %s is down by %s percent. %n%s %.2f -> %s %.2f",
                 cryptoCode,
                 cryptoName,
                 threshold,
