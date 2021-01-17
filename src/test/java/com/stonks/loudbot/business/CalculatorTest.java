@@ -3,7 +3,7 @@ package com.stonks.loudbot.business;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class CalculatorTest {
+class CalculatorTest {
 
     @Test
     void testCalculateDiffWhenGain(){
