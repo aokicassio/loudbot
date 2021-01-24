@@ -1,14 +1,12 @@
-package com.stonks.loudbot.web.service.impl;
+package com.stonks.loudbot.web.watcher;
 
 import com.stonks.loudbot.business.Calculator;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Component
-public class BitcoinWatcher {
+public class Watcher {
 
     private double checkpoint;
 

@@ -1,10 +1,13 @@
 package com.stonks.loudbot.web.scheduler;
 
 import com.stonks.loudbot.model.Crypto;
+import com.stonks.loudbot.model.CryptoCurrency;
 import com.stonks.loudbot.web.service.CryptoCompareService;
 import com.stonks.loudbot.web.service.MessageSenderService;
 import com.stonks.loudbot.web.service.PhoneNumberService;
 import com.stonks.loudbot.web.util.EntityMapper;
+import com.stonks.loudbot.web.util.MessageTemplateUtil;
+import com.stonks.loudbot.web.watcher.Watcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Mono;
@@ -25,6 +28,19 @@ public abstract class CryptoScheduler {
     protected PhoneNumberService phoneNumberService;
 
     protected abstract void scheduleCheck();
+
+    protected void checkDifference(double diff, double thresholdGain, double thresholdLoss, double currentValue,
+                                   CryptoCurrency cryptoCurrency, Watcher watcher, MessageSenderService messageSenderService){
+        if(diff >= thresholdGain) {
+            watcher.setCheckpoint(currentValue);
+            sendMessage(messageSenderService, MessageTemplateUtil.messageGain(
+                    cryptoCurrency, thresholdGain, currency, watcher.getCheckpoint(), currentValue));
+        } else if (diff <= thresholdLoss) {
+            watcher.setCheckpoint(currentValue);
+            sendMessage(messageSenderService, MessageTemplateUtil.messageLoss(
+                    cryptoCurrency, thresholdLoss, currency, watcher.getCheckpoint(), currentValue));
+        }
+    }
 
     /**
      * Sends out messages to phone numbers on list

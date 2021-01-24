@@ -20,12 +20,14 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
     @Autowired
     protected CryptoCompareService cryptoCompareService;
 
+    private static final CryptoCurrency ETHEREUM = CryptoCurrency.ETHEREUM;
+
     @Override
-    //@Scheduled(fixedRateString = "${scheduler.rate}", initialDelay = 2000)
     protected void scheduleCheck() {
         LOGGER.log(Level.INFO, "Ethereum Scheduler check triggered");
-        double currentValue = getCryptoCurrentValue(CryptoCurrency.BITCOIN.getCode(), currency);
+        double currentValue = getCryptoCurrentValue(ETHEREUM.getCode(), currency);
+
         sendMessage(whatsappMessageSender, String.format ("[%s] %s current price is %s %.2f",
-                CryptoCurrency.ETHEREUM.getCode(), CryptoCurrency.ETHEREUM.getName(), currency, currentValue));
+                ETHEREUM.getCode(), ETHEREUM.getName(), currency, currentValue));
     }
 }

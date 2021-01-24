@@ -2,8 +2,7 @@ package com.stonks.loudbot.web.scheduler;
 
 import com.stonks.loudbot.model.CryptoCurrency;
 import com.stonks.loudbot.web.service.MessageSenderService;
-import com.stonks.loudbot.web.service.impl.BitcoinWatcher;
-import com.stonks.loudbot.web.util.MessageTemplateUtil;
+import com.stonks.loudbot.web.watcher.Watcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,40 +24,27 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
     private double thresholdLoss;
 
     @Autowired
-    private BitcoinWatcher bitcoinWatcher;
+    private Watcher bitcoinWatcher;
 
     @Autowired
     protected MessageSenderService whatsappMessageSender;
 
+    private static final CryptoCurrency BITCOIN = CryptoCurrency.BITCOIN;
+
     @PostConstruct
     public void initBitcoinCryptoScheduler(){
+        LOGGER.log(Level.INFO, BITCOIN.getName() + " scheduler has started.");
         if(bitcoinWatcher.getCheckpoint() == 0){
-            bitcoinWatcher.updateCheckpoint(getCryptoCurrentValue(CryptoCurrency.BITCOIN.getCode(), currency));
+            bitcoinWatcher.updateCheckpoint(getCryptoCurrentValue(BITCOIN.getCode(), currency));
         }
     }
 
     @Override
     @Scheduled(fixedRateString = "${scheduler.rate}", initialDelay = 2000)
     protected void scheduleCheck() {
-        LOGGER.log(Level.INFO, "Bitcoin Scheduler check triggered");
-
-        double currentValue = getCryptoCurrentValue(CryptoCurrency.BITCOIN.getCode(), currency);
-
+        double currentValue = getCryptoCurrentValue(BITCOIN.getCode(), currency);
         double diff = bitcoinWatcher.checkDiff(currentValue);
-
-        if(diff >= thresholdGain) {
-            bitcoinWatcher.setCheckpoint(currentValue);
-            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageGain(
-                    CryptoCurrency.BITCOIN.getCode(), CryptoCurrency.BITCOIN.getName(), thresholdGain, currency, bitcoinWatcher.getCheckpoint(), currentValue));
-        } else if (diff <= thresholdLoss) {
-            bitcoinWatcher.setCheckpoint(currentValue);
-            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageLoss(
-                    CryptoCurrency.BITCOIN.getCode(), CryptoCurrency.BITCOIN.getName(), thresholdLoss, currency, bitcoinWatcher.getCheckpoint(), currentValue));
-        } else {
-            sendMessage(whatsappMessageSender, MessageTemplateUtil.messageDiff(
-                    CryptoCurrency.BITCOIN.getCode(), CryptoCurrency.BITCOIN.getName(), diff, currency, bitcoinWatcher.getCheckpoint(), currentValue));
-        }
-
+        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, BITCOIN, bitcoinWatcher, whatsappMessageSender);
     }
 
 }

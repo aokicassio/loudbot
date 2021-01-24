@@ -8,11 +8,12 @@ import org.junit.jupiter.api.Test;
 
 class MessageTemplateUtilTest {
 
+    private static final CryptoCurrency ETHEREUM = CryptoCurrency.ETHEREUM;
+
     @Test
     void testMessageGain(){
         String message = MessageTemplateUtil.messageGain(
-                CryptoCurrency.ETHEREUM.getCode(),
-                CryptoCurrency.ETHEREUM.getName(),
+                ETHEREUM,
                 10,
                 Currency.EURO.getCode(),
                 1000,
@@ -28,8 +29,7 @@ class MessageTemplateUtilTest {
     @Test
     void testMessageLoss(){
         String message = MessageTemplateUtil.messageLoss(
-                CryptoCurrency.ETHEREUM.getCode(),
-                CryptoCurrency.ETHEREUM.getName(),
+                ETHEREUM,
                 10,
                 Currency.EURO.getCode(),
                 1000,
