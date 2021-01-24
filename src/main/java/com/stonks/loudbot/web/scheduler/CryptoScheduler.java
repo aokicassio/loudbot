@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,16 +30,19 @@ public abstract class CryptoScheduler {
 
     protected abstract void scheduleCheck();
 
+    protected LocalDateTime lastCheckDate;
+
     protected void checkDifference(double diff, double thresholdGain, double thresholdLoss, double currentValue,
                                    CryptoCurrency cryptoCurrency, Watcher watcher, MessageSenderService messageSenderService){
         if(diff >= thresholdGain) {
             watcher.setCheckpoint(currentValue);
+            watcher.setLastCheckpointDate(lastCheckDate);
             sendMessage(messageSenderService, MessageTemplateUtil.messageGain(
-                    cryptoCurrency, thresholdGain, currency, watcher.getCheckpoint(), currentValue));
+                    cryptoCurrency, thresholdGain, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
         } else if (diff <= thresholdLoss) {
             watcher.setCheckpoint(currentValue);
             sendMessage(messageSenderService, MessageTemplateUtil.messageLoss(
-                    cryptoCurrency, thresholdLoss, currency, watcher.getCheckpoint(), currentValue));
+                    cryptoCurrency, thresholdLoss, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
         }
     }
 
@@ -53,7 +57,7 @@ public abstract class CryptoScheduler {
         for(String phoneNumber : phoneNumberService.getPhoneNumbers()){
             LOGGER.log(Level.INFO, String.format("Sending message to %s ", phoneNumber));
             LOGGER.log(Level.INFO, body);
-            messageSenderService.sendMessage(body, phoneNumber);
+            //messageSenderService.sendMessage(body, phoneNumber);
         }
     }
 
@@ -64,6 +68,7 @@ public abstract class CryptoScheduler {
      * @return
      */
     protected double getCryptoCurrentValue(String code, String currency){
+        lastCheckDate = LocalDateTime.now();
         Mono<String> cryptoCoin = cryptoCompareService.getCryptoCurrentPrice(code, currency);
         String response = cryptoCoin.block();
         Crypto crypto = EntityMapper.parseCryptoFromJsonString(response.toLowerCase());
