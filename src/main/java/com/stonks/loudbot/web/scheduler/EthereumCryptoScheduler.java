@@ -9,13 +9,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class EthereumCryptoScheduler extends CryptoScheduler {
 
-    private static final Logger LOGGER = Logger.getLogger(EthereumCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.ethereum.gain}")
     private double thresholdGain;
@@ -33,10 +30,7 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initEthereumCryptoScheduler(){
-        LOGGER.log(Level.INFO, ETHEREUM.getName() + " scheduler has started.");
-        if(ethereumWatcher.getCheckpoint() == 0){
-            ethereumWatcher.updateCheckpoint(getCryptoCurrentValue(ETHEREUM.getCode(), currency));
-        }
+        initWatcher(ETHEREUM, ethereumWatcher);
     }
 
     @Override
@@ -44,6 +38,6 @@ public class EthereumCryptoScheduler extends CryptoScheduler {
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(ETHEREUM.getCode(), currency);
         double diff = ethereumWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, ETHEREUM, ethereumWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, ETHEREUM, ethereumWatcher, whatsappMessageSender);
     }
 }

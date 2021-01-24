@@ -22,6 +22,9 @@ public abstract class CryptoScheduler {
     @Value("${config.currency}")
     protected String currency;
 
+    @Value("${config.messaging.enabled}")
+    protected boolean messaging;
+
     @Autowired
     protected CryptoCompareService cryptoCompareService;
 
@@ -32,17 +35,25 @@ public abstract class CryptoScheduler {
 
     protected LocalDateTime lastCheckDate;
 
-    protected void checkDifference(double diff, double thresholdGain, double thresholdLoss, double currentValue,
-                                   CryptoCurrency cryptoCurrency, Watcher watcher, MessageSenderService messageSenderService){
+    protected void initWatcher(CryptoCurrency cryptoCurrency, Watcher watcher){
+        LOGGER.log(Level.INFO, cryptoCurrency.getName() + " scheduler has started.");
+        if(watcher.getCheckpoint() == 0){
+            double currentValue = getCryptoCurrentValue(cryptoCurrency.getCode(), currency);
+            watcher.updateCheckpoint(currentValue, lastCheckDate);
+        }
+    }
+
+    protected void compareWithThresholds(double diff, double thresholdGain, double thresholdLoss, double currentValue,
+                                         CryptoCurrency cryptoCurrency, Watcher watcher, MessageSenderService messageSenderService){
         if(diff >= thresholdGain) {
-            watcher.setCheckpoint(currentValue);
-            watcher.setLastCheckpointDate(lastCheckDate);
             sendMessage(messageSenderService, MessageTemplateUtil.messageGain(
-                    cryptoCurrency, thresholdGain, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
+                    cryptoCurrency, diff, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
+            watcher.updateCheckpoint(currentValue, lastCheckDate);
+
         } else if (diff <= thresholdLoss) {
-            watcher.setCheckpoint(currentValue);
             sendMessage(messageSenderService, MessageTemplateUtil.messageLoss(
-                    cryptoCurrency, thresholdLoss, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
+                    cryptoCurrency, diff, currency, watcher.getCheckpoint(), currentValue, lastCheckDate));
+            watcher.updateCheckpoint(currentValue, lastCheckDate);
         }
     }
 
@@ -57,7 +68,9 @@ public abstract class CryptoScheduler {
         for(String phoneNumber : phoneNumberService.getPhoneNumbers()){
             LOGGER.log(Level.INFO, String.format("Sending message to %s ", phoneNumber));
             LOGGER.log(Level.INFO, body);
-            //messageSenderService.sendMessage(body, phoneNumber);
+            if(messaging){
+                messageSenderService.sendMessage(body, phoneNumber);
+            }
         }
     }
 

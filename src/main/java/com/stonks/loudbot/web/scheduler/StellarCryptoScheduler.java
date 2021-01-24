@@ -8,13 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class StellarCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(StellarCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.stellar.gain}")
     private double thresholdGain;
@@ -32,17 +28,14 @@ public class StellarCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initStellarCryptoScheduler(){
-        LOGGER.log(Level.INFO, STELLAR.getName() + " scheduler has started.");
-        if(stellarWatcher.getCheckpoint() == 0){
-            stellarWatcher.updateCheckpoint(getCryptoCurrentValue(CryptoCurrency.BITCOIN.getCode(), currency));
-        }
+        initWatcher(STELLAR, stellarWatcher);
     }
 
     @Override
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(STELLAR.getCode(), currency);
         double diff = stellarWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, STELLAR, stellarWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, STELLAR, stellarWatcher, whatsappMessageSender);
     }
 
 }

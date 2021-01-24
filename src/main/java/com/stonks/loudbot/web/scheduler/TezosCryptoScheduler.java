@@ -8,13 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class TezosCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(TezosCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.stellar.gain}")
     private double thresholdGain;
@@ -32,17 +28,14 @@ public class TezosCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initTezosCryptoScheduler(){
-        LOGGER.log(Level.INFO, TEZOS.getName() + " scheduler has started.");
-        if(tezosWatcher.getCheckpoint() == 0){
-            tezosWatcher.updateCheckpoint(getCryptoCurrentValue(TEZOS.getCode(), currency));
-        }
+        initWatcher(TEZOS, tezosWatcher);
     }
 
     @Override
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(TEZOS.getCode(), currency);
         double diff = tezosWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, TEZOS, tezosWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, TEZOS, tezosWatcher, whatsappMessageSender);
     }
 
 }

@@ -4,7 +4,6 @@ import com.stonks.loudbot.business.Calculator;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,13 +11,14 @@ import java.time.LocalDateTime;
 public class Watcher {
 
     private double checkpoint;
-    private LocalDateTime lastCheckpointDate;
+    private LocalDateTime checkpointDate;
 
     public double checkDiff(double newPrice){
         return Calculator.calculateDiff(checkpoint, newPrice);
     }
 
-    public void updateCheckpoint(double newValue){
-        this.setCheckpoint(newValue);
+    public void updateCheckpoint(double newCheckpoint, LocalDateTime dateTime){
+        this.setCheckpoint(newCheckpoint);
+        this.setCheckpointDate(dateTime);
     }
 }

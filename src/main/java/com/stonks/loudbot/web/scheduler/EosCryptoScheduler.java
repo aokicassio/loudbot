@@ -8,13 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class EosCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(EosCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.stellar.gain}")
     private double thresholdGain;
@@ -32,17 +28,14 @@ public class EosCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initEosCryptoScheduler(){
-        LOGGER.log(Level.INFO, EOS.getName() + " scheduler has started.");
-        if(eosWatcher.getCheckpoint() == 0){
-            eosWatcher.updateCheckpoint(getCryptoCurrentValue(EOS.getCode(), currency));
-        }
+        initWatcher(EOS, eosWatcher);
     }
 
     @Override
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(EOS.getCode(), currency);
         double diff = eosWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, EOS, eosWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, EOS, eosWatcher, whatsappMessageSender);
     }
 
 }

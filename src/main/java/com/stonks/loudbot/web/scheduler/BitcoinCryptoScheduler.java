@@ -9,13 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class BitcoinCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(BitcoinCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.bitcoin.gain}")
     private double thresholdGain;
@@ -33,10 +29,7 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initBitcoinCryptoScheduler(){
-        LOGGER.log(Level.INFO, BITCOIN.getName() + " scheduler has started.");
-        if(bitcoinWatcher.getCheckpoint() == 0){
-            bitcoinWatcher.updateCheckpoint(getCryptoCurrentValue(BITCOIN.getCode(), currency));
-        }
+        initWatcher(BITCOIN, bitcoinWatcher);
     }
 
     @Override
@@ -44,7 +37,7 @@ public class BitcoinCryptoScheduler extends CryptoScheduler {
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(BITCOIN.getCode(), currency);
         double diff = bitcoinWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, BITCOIN, bitcoinWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, BITCOIN, bitcoinWatcher, whatsappMessageSender);
     }
 
 }

@@ -8,13 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class ZeroXCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(ZeroXCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.stellar.gain}")
     private double thresholdGain;
@@ -23,7 +19,7 @@ public class ZeroXCryptoScheduler extends CryptoScheduler {
     private double thresholdLoss;
 
     @Autowired
-    private Watcher eosWatcher;
+    private Watcher zeroXWatcher;
 
     @Autowired
     protected MessageSenderService whatsappMessageSender;
@@ -32,17 +28,14 @@ public class ZeroXCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initZeroXCryptoScheduler(){
-        LOGGER.log(Level.INFO, ZERO_X.getName() + " scheduler has started.");
-        if(eosWatcher.getCheckpoint() == 0){
-            eosWatcher.updateCheckpoint(getCryptoCurrentValue(ZERO_X.getCode(), currency));
-        }
+        initWatcher(ZERO_X, zeroXWatcher);
     }
 
     @Override
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(ZERO_X.getCode(), currency);
-        double diff = eosWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, ZERO_X, eosWatcher, whatsappMessageSender);
+        double diff = zeroXWatcher.checkDiff(currentValue);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, ZERO_X, zeroXWatcher, whatsappMessageSender);
     }
 
 }

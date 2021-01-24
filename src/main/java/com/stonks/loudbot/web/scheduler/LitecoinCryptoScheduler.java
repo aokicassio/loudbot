@@ -8,13 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public class LitecoinCryptoScheduler extends CryptoScheduler {
-
-    private static final Logger LOGGER = Logger.getLogger(LitecoinCryptoScheduler.class.getName());
 
     @Value("${threshold.crypto.litecoin.gain}")
     private double thresholdGain;
@@ -32,17 +28,14 @@ public class LitecoinCryptoScheduler extends CryptoScheduler {
 
     @PostConstruct
     public void initLitecoinCryptoScheduler(){
-        LOGGER.log(Level.INFO, LITECOIN.getName() + " scheduler has started.");
-        if(litecoinWatcher.getCheckpoint() == 0){
-            litecoinWatcher.updateCheckpoint(getCryptoCurrentValue(LITECOIN.getCode(), currency));
-        }
+        initWatcher(LITECOIN, litecoinWatcher);
     }
 
     @Override
     protected void scheduleCheck() {
         double currentValue = getCryptoCurrentValue(LITECOIN.getCode(), currency);
         double diff = litecoinWatcher.checkDiff(currentValue);
-        checkDifference(diff, thresholdGain, thresholdLoss, currentValue, LITECOIN, litecoinWatcher, whatsappMessageSender);
+        compareWithThresholds(diff, thresholdGain, thresholdLoss, currentValue, LITECOIN, litecoinWatcher, whatsappMessageSender);
     }
 
 }

@@ -12,35 +12,34 @@ public class MessageTemplateUtil {
 
     public static String formatDate(LocalDateTime localDate){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy hh:mm");
-        String formattedString = localDate.format(formatter);
-        return formattedString;
+        return localDate.format(formatter);
     }
 
-    public static String messageGain(CryptoCurrency cryptoCurrency, double threshold, String currency, double previousValue, double currentValue, LocalDateTime lastCheckDate) {
-        return String.format ("[%s] %s is up by %s%% since %s. %n%s %.2f -> %s %.2f",
+    public static String messageGain(CryptoCurrency cryptoCurrency, double diff, String currency, double previousValue, double currentValue, LocalDateTime lastCheckDate) {
+        return String.format ("[%s] %s is up by %.2f%% since %s. %n%s %.2f -> %s %.2f",
                 cryptoCurrency.getCode(),
                 cryptoCurrency.getName(),
-                threshold,
+                diff,
                 formatDate(lastCheckDate),
                 currency, previousValue,
                 currency, currentValue);
     }
 
-    public static String messageLoss(CryptoCurrency cryptoCurrency, double threshold, String currency, double previousValue, double currentValue, LocalDateTime lastCheckDate) {
-        return String.format ("[%s] %s is down by %s%% since %s. %n%s %.2f -> %s %.2f",
+    public static String messageLoss(CryptoCurrency cryptoCurrency, double diff, String currency, double previousValue, double currentValue, LocalDateTime lastCheckDate) {
+        return String.format ("[%s] %s is down by %.2f%% since %s. %n%s %.2f -> %s %.2f",
                 cryptoCurrency.getCode(),
                 cryptoCurrency.getName(),
-                threshold,
+                diff,
                 formatDate(lastCheckDate),
                 currency, previousValue,
                 currency, currentValue);
     }
 
-    public static String messageDiff(CryptoCurrency cryptoCurrency, double threshold, String currency, double previousValue, double currentValue) {
+    public static String messageDiff(CryptoCurrency cryptoCurrency, double diff, String currency, double previousValue, double currentValue) {
         return String.format ("[%s] %s diff is %.2f%% since last check. %n%s %.2f -> %s %.2f",
                 cryptoCurrency.getCode(),
                 cryptoCurrency.getName(),
-                threshold,
+                diff,
                 currency, previousValue,
                 currency, currentValue);
     }
