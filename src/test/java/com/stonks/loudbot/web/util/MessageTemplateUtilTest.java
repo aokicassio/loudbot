@@ -26,7 +26,7 @@ class MessageTemplateUtilTest {
                 DATETIME);
 
         Assertions.assertThat(message)
-                .contains("[ETH] Ethereum is up by 10.0 percent since 22 January 2021 12:30.")
+                .contains("[ETH] Ethereum is up by 10.0% since 22 January 2021 12:30.")
                 .contains("EUR 1000.00 -> EUR 1100.00");
 
         System.out.println(message);
@@ -43,7 +43,7 @@ class MessageTemplateUtilTest {
                 DATETIME);
 
         Assertions.assertThat(message)
-                .contains("[ETH] Ethereum is down by 10.0 percent since 22 January 2021 12:30.")
+                .contains("[ETH] Ethereum is down by 10.0% since 22 January 2021 12:30.")
                 .contains("EUR 1000.00 -> EUR 900.00");
     }
 
